@@ -1,3 +1,12 @@
 /backend/node_modules/
 /backend/dist/
 /backend/.env
+/backend/cursor/
+/backend/docs/
+/backend/tests/
+/backend/logs/
+/backend/tmp/
+/backend/cache/
+/backend/backup/
+/backend/archive/
+/backend/archive/
