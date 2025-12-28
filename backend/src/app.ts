@@ -1,6 +1,6 @@
 import express from "express";
 import { pool } from "./db";
-import { redis } from "./queues/redis";
+import authRoutes from "./routes/auth";
 
 const app = express();
 app.use(express.json());
@@ -10,14 +10,28 @@ app.get("/health", (_, res) => {
 });
 
 app.get("/db-check", async (_, res) => {
-  const result = await pool.query("SELECT 1");
-  res.json({ db: "connected" });
+  try {
+    const result = await pool.query("SELECT 1");
+    res.json({ db: "connected" });
+  } catch (error) {
+    console.error("DB check error:", error);
+    res.status(500).json({ error: "Database connection failed" });
+  }
 });
 
-app.get("/redis-check", async (_, res) => {
-  await redis.set("ping", "pong");
-  const value = await redis.get("ping");
-  res.json({ redis: value });
-});
+app.use("/auth", authRoutes);
+
+// Global error handler
+app.use(
+  (
+    err: Error,
+    req: express.Request,
+    res: express.Response,
+    next: express.NextFunction
+  ) => {
+    console.error("Unhandled error:", err);
+    res.status(500).json({ error: "Internal server error" });
+  }
+);
 
 export default app;
