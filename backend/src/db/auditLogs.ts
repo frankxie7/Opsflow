@@ -16,12 +16,12 @@ export async function createAuditLog(input: CreateAuditLogInput): Promise<AuditL
       input.entity_id,
       input.action,
       input.user_id || null,
-      input.metadata ? JSON.stringify(input.metadata) : null,
+      input.metadata || null, // PostgreSQL JSONB accepts objects directly
     ]
   );
   return {
     ...result.rows[0],
-    metadata: result.rows[0].metadata ? JSON.parse(result.rows[0].metadata) : null,
+    metadata: result.rows[0].metadata, // PostgreSQL JSONB returns as object
   };
 }
 
@@ -36,9 +36,10 @@ export async function findAuditLogsByEntity(
      ORDER BY created_at DESC`,
     [entityType, entityId]
   );
+  // PostgreSQL JSONB columns return as objects, not strings
   return result.rows.map((row) => ({
     ...row,
-    metadata: row.metadata ? JSON.parse(row.metadata) : null,
+    metadata: row.metadata, // Already an object from JSONB
   }));
 }
 
@@ -50,8 +51,9 @@ export async function findAuditLogsByUser(userId: number): Promise<AuditLog[]> {
      ORDER BY created_at DESC`,
     [userId]
   );
+  // PostgreSQL JSONB columns return as objects, not strings
   return result.rows.map((row) => ({
     ...row,
-    metadata: row.metadata ? JSON.parse(row.metadata) : null,
+    metadata: row.metadata, // Already an object from JSONB
   }));
 }
