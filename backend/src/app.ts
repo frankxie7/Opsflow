@@ -1,6 +1,8 @@
 import express from "express";
 import { pool } from "./db";
 import authRoutes from "./routes/auth";
+import taskRoutes from "./routes/tasks";
+import webhookRoutes from "./routes/webhooks";
 
 const app = express();
 app.use(express.json());
@@ -20,6 +22,8 @@ app.get("/db-check", async (_, res) => {
 });
 
 app.use("/auth", authRoutes);
+app.use("/tasks", taskRoutes);
+app.use("/webhooks", webhookRoutes);
 
 // Global error handler
 app.use(
